@@ -1,50 +1,53 @@
-// Observer pattern
+// mediator pattern
 
-function EventObserver() {
-  this.observers = [];
-}
+const User = function (name) {
+  this.name = name;
+  this.chatroom = null;
+};
 
-EventObserver.prototype = {
-  subscribe: function (fn) {
-    this.observers.push(fn);
-    console.log(`You are now subscribed to ${fn.name}`);
+User.prototype = {
+  send: function (message, to) {
+    this.chatroom.send(message, this, to);
   },
+  receive: function (message, from) {
+    console.log(`${from.name} to ${this.name} : ${message}`);
+  },
+};
 
-  unsubscribe: function (fn) {
-    this.observers = this.observers.filter((item) => {
-      if (item !== fn) {
-        return item;
+const Chatroom = function () {
+  let users = {}; // list of users
+
+  return {
+    register: function (user) {
+      users[user.name] = user;
+      user.chatroom = this;
+    },
+    send: function (message, from, to) {
+      if (to) {
+        // Single user message
+        to.receive(message, from);
+      } else {
+        // Mass message
+        for (key in users) {
+          if (users[key] !== from) {
+            users[key].receive(message, from);
+          }
+        }
       }
-    });
-
-    console.log(`You are now unsubscribed from ${fn.name}`);
-  },
-
-  fire: function () {
-    this.observers.forEach((item) => {
-      item.call();
-    });
-  },
+    },
+  };
 };
 
-const click = new EventObserver();
+const patrick = new User("Patrick KIM");
+const kiana = new User("Kiana KIM");
+const daniel = new User("Daniel KIM");
 
-console.log(click);
+const chatroom = new Chatroom();
 
-// Event Listeners
-document.querySelector(".sub-ms").addEventListener("click", () => {
-  click.subscribe(getCurMilliseconds);
-});
+chatroom.register(patrick);
+chatroom.register(kiana);
+chatroom.register(daniel);
 
-document.querySelector(".unsub-ms").addEventListener("click", () => {
-  click.unsubscribe(getCurMilliseconds);
-});
-
-document.querySelector(".fire").addEventListener("click", () => {
-  click.fire();
-});
-
-// CLick Handler
-const getCurMilliseconds = function () {
-  console.log(`Current Milliseconds: ${new Date().getMilliseconds()}`);
-};
+patrick.send("Hello Kiana", kiana);
+kiana.send("Hello patrick You are the best dev ever!", daniel);
+daniel.send("Hello everyone");

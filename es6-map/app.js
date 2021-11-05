@@ -1,27 +1,27 @@
-// Revealing Module pattern
+// Singleton pattern with IIFE(Imediately-invoked function express)
 
-const ItemCtrl = (function () {
-  let data = [];
+const Singleton = (function () {
+  let instance;
 
-  function add(item) {
-    data.push(item);
-    console.log("item Added!!!🐨");
-  }
-
-  function get(id) {
-    return data.find((item) => {
-      return item.id === id;
-    });
+  function createInstance() {
+    const object = new Object({ name: "Brad" });
+    return object;
   }
 
   return {
-    add,
-    get,
+    getInstance: function () {
+      if (!instance) {
+        instance = createInstance();
+      }
+
+      return instance;
+    },
   };
 })();
 
-ItemCtrl.add({ id: 1, name: "Patrick KIM" });
-ItemCtrl.add({ id: 2, name: "Kiana Marie Elliott" });
-ItemCtrl.add({ id: 3, name: "Daniel" });
+const instance1 = Singleton.getInstance();
+const instance2 = Singleton.getInstance();
+const instance3 = Singleton.getInstance();
 
-console.log(ItemCtrl.get(2));
+console.log(instance1);
+console.log(instance2 === instance2);

@@ -1,79 +1,50 @@
-// Singleton pattern with IIFE(Imediately-invoked function express)
+// Observer pattern
 
-// const Singleton = (function () {
-//   let instance;
+function EventObserver() {
+  this.observers = [];
+}
 
-//   function createInstance() {
-//     const object = new Object({ name: "Brad" });
-//     return object;
-//   }
+EventObserver.prototype = {
+  subscribe: function (fn) {
+    this.observers.push(fn);
+    console.log(`You are now subscribed to ${fn.name}`);
+  },
 
-//   return {
-//     getInstance: function () {
-//       if (!instance) {
-//         instance = createInstance();
-//       }
+  unsubscribe: function (fn) {
+    this.observers = this.observers.filter((item) => {
+      if (item !== fn) {
+        return item;
+      }
+    });
 
-//       return instance;
-//     },
-//   };
-// })();
+    console.log(`You are now unsubscribed from ${fn.name}`);
+  },
 
-// const instance1 = Singleton.getInstance();
-// const instance2 = Singleton.getInstance();
-// const instance3 = Singleton.getInstance();
+  fire: function () {
+    this.observers.forEach((item) => {
+      item.call();
+    });
+  },
+};
 
-// console.log(instance1);
-// console.log(instance2 === instance2);
+const click = new EventObserver();
 
-// Factory pattern
-// function MemberFactory() {
-//   this.createMember = function (name, type) {
-//     let member;
+console.log(click);
 
-//     if (type === "simple") {
-//       member = new SimpleMembership(name);
-//     } else if (type === "standard") {
-//       member = new StandardMembership(name);
-//     } else if (type === "super") {
-//       member = new SuperMembership(name);
-//     }
+// Event Listeners
+document.querySelector(".sub-ms").addEventListener("click", () => {
+  click.subscribe(getCurMilliseconds);
+});
 
-//     member.type = type;
+document.querySelector(".unsub-ms").addEventListener("click", () => {
+  click.unsubscribe(getCurMilliseconds);
+});
 
-//     member.define = function () {
-//       console.log(`${this.name} (${this.type} : ${this.cost})`);
-//     };
+document.querySelector(".fire").addEventListener("click", () => {
+  click.fire();
+});
 
-//     return member;
-//   };
-// }
-
-// const SimpleMembership = function (name) {
-//   this.name = name;
-//   this.cost = "$5";
-// };
-
-// const StandardMembership = function (name) {
-//   this.name = name;
-//   this.cost = "$15";
-// };
-
-// const SuperMembership = function (name) {
-//   this.name = name;
-//   this.cost = "$25";
-// };
-
-// const members = [];
-// const factory = new MemberFactory();
-
-// members.push(factory.createMember("Patrick KIM", "simple"));
-// members.push(factory.createMember("Chris Park", "standard"));
-// members.push(factory.createMember("Elliott Lee", "super"));
-// members.push(factory.createMember("Marie Loo", "standard"));
-
-// console.log(members);
-
-// members.forEach(function (member) {
-//   member.define();
-// });
+// CLick Handler
+const getCurMilliseconds = function () {
+  console.log(`Current Milliseconds: ${new Date().getMilliseconds()}`);
+};

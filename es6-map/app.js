@@ -1,53 +1,70 @@
-// mediator pattern
+const PageState = function () {
+  let currentState = new homeState();
 
-const User = function (name) {
-  this.name = name;
-  this.chatroom = null;
-};
+  this.init = function () {
+    this.change(new homeState());
+  };
 
-User.prototype = {
-  send: function (message, to) {
-    this.chatroom.send(message, this, to);
-  },
-  receive: function (message, from) {
-    console.log(`${from.name} to ${this.name} : ${message}`);
-  },
-};
-
-const Chatroom = function () {
-  let users = {}; // list of users
-
-  return {
-    register: function (user) {
-      users[user.name] = user;
-      user.chatroom = this;
-    },
-    send: function (message, from, to) {
-      if (to) {
-        // Single user message
-        to.receive(message, from);
-      } else {
-        // Mass message
-        for (key in users) {
-          if (users[key] !== from) {
-            users[key].receive(message, from);
-          }
-        }
-      }
-    },
+  this.change = function (state) {
+    currentState = state;
   };
 };
 
-const patrick = new User("Patrick KIM");
-const kiana = new User("Kiana KIM");
-const daniel = new User("Daniel KIM");
+// HomeState
+const homeState = function (page) {
+  document.querySelector("#heading").textContent = null;
+  document.querySelector("#content").innerHTML = `
+  <div class="jumbotron">
+    <h1 class="display-4">Hello, world!</h1>
+    <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
+    <hr class="my-4">
+    <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
+    <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
+</div>
+  `;
+};
 
-const chatroom = new Chatroom();
+// About state
+const aboutState = function (page) {
+  document.querySelector("#heading").textContent = "About us";
+  document.querySelector("#content").innerHTML = `
+    <p>This is The about page</p>
+  `;
+};
 
-chatroom.register(patrick);
-chatroom.register(kiana);
-chatroom.register(daniel);
+// Contact state
+const contactState = function (page) {
+  document.querySelector("#heading").textContent = "About us";
+  document.querySelector("#content").innerHTML = `
+    <p>This is The Contact page</p>
+  `;
+};
 
-patrick.send("Hello Kiana", kiana);
-kiana.send("Hello patrick You are the best dev ever!", daniel);
-daniel.send("Hello everyone");
+// Initial pageState
+const page = new PageState();
+
+// Init the first state
+page.init();
+
+// UI vars
+const home = document.getElementById("home");
+const about = document.getElementById("about");
+const contact = document.getElementById("contact");
+
+home.addEventListener("click", (e) => {
+  page.change(new homeState());
+
+  e.preventDefault();
+});
+
+about.addEventListener("click", (e) => {
+  page.change(new aboutState());
+
+  e.preventDefault();
+});
+
+contact.addEventListener("click", (e) => {
+  page.change(new contactState());
+
+  e.preventDefault();
+});
